@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Ray.BiliBiliTool.Agent;
 using Ray.BiliBiliTool.Agent.BiliBiliAgent.Dtos;
@@ -18,17 +17,19 @@ namespace Ray.BiliBiliTool.DomainService
         private readonly IDailyTaskApi _dailyTaskApi;
         private readonly DailyTaskOptions _dailyTaskOptions;
         private readonly BiliCookie _biliBiliCookie;
+        private readonly ReceiveVipPrivilegeOptions _receiveVipPrivilegeOptionsce;
 
         public VipPrivilegeDomainService(
             ILogger<VipPrivilegeDomainService> logger,
             IDailyTaskApi dailyTaskApi,
             BiliCookie biliBiliCookieOptions,
-            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions
-            )
+            IOptionsMonitor<DailyTaskOptions> dailyTaskOptions,
+            IOptionsMonitor<ReceiveVipPrivilegeOptions> receiveVipPrivilegeOptionsce)
         {
             _logger = logger;
             _dailyTaskApi = dailyTaskApi;
             _dailyTaskOptions = dailyTaskOptions.CurrentValue;
+            _receiveVipPrivilegeOptionsce = receiveVipPrivilegeOptionsce.CurrentValue;
             _biliBiliCookie = biliBiliCookieOptions;
         }
 
@@ -38,20 +39,21 @@ namespace Ray.BiliBiliTool.DomainService
         /// <param name="useInfo"></param>
         public bool ReceiveVipPrivilege(UserInfo userInfo)
         {
-            if (_dailyTaskOptions.DayOfReceiveVipPrivilege == 0)
+            if (!_receiveVipPrivilegeOptionsce.IsEnable)
             {
                 _logger.LogInformation("已配置为关闭，跳过");
                 return false;
             }
 
             //大会员类型
-            int vipType = userInfo.GetVipType();
-            if (vipType != 2)
+            VipType vipType = userInfo.GetVipType();
+            if (vipType != VipType.Annual)
             {
                 _logger.LogInformation("普通会员和月度大会员每月不赠送B币券，不需要领取权益喽");
                 return false;
             }
 
+            /*
             int targetDay = _dailyTaskOptions.DayOfReceiveVipPrivilege == -1
                 ? 1
                 : _dailyTaskOptions.DayOfReceiveVipPrivilege;
@@ -65,6 +67,7 @@ namespace Ray.BiliBiliTool.DomainService
                 _logger.LogInformation("跳过");
                 return false;
             }
+            */
 
             var suc1 = ReceiveVipPrivilege(1);
             var suc2 = ReceiveVipPrivilege(2);

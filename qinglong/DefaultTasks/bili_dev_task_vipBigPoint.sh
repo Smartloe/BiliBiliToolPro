@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# new Env("bili天选时刻[dev先行版]")
-# cron 0 13 * * * bili_dev_task_liveLottery.sh
+# new Env("bili大会员大积分[dev先行版]")
+# cron 7 1 * * * bili_dev_task_vipBigPoint.sh
 
 dir_shell=$QL_DIR/shell
 . $dir_shell/share.sh
@@ -13,5 +13,5 @@ echo -e "bili仓库目录: $bili_repo_dir\n"
 
 cd $bili_repo_dir
 export ENVIRONMENT=Production && \
-export Ray_RunTasks=LiveLottery && \
+export Ray_RunTasks=VipBigPoint && \
 dotnet run --project ./src/Ray.BiliBiliTool.Console
